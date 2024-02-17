@@ -1,4 +1,4 @@
-package com.example.storewithcompose
+package com.example.storewithcompose.ViewModel
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
