@@ -19,7 +19,7 @@ class MainActivity : ComponentActivity() {
 
                     composable("LoginScreen") { LoginScreen(onLoginClick = { navController.navigate("AddProductScreen") }) }
                     composable("AddProductScreen") { AddProductScreen() }
-                    composable("ProductScreen") { ShowProductScreen()  }
+
 
                 //ProductScreen
                   //AddProductScreen()

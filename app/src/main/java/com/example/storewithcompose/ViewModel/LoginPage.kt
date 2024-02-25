@@ -99,7 +99,7 @@ fun LoginScreen(
           //Color
           ) {
 
-          Text(text ="Müşteri Kullanıcıyım.")
+          Text(text ="Müşteriyim")
 
       }
 
