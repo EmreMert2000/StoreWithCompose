@@ -33,13 +33,21 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.Alignment
 import com.example.storewithcompose.data.Product
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-
+import com.google.firebase.firestore.SetOptions
 
 
 @Composable
@@ -53,10 +61,18 @@ fun AddProductScreen() {
 
     val context = LocalContext.current
 
+    //List Work
+    var selectedProductId by remember { mutableStateOf<String?>(null) }
+    var isUpdateButtonEnabled by remember { mutableStateOf(false) }
+    var isDeleteButtonEnabled by remember { mutableStateOf(false) }
+
+
     //Firebase Database :add to item
 
     val db = FirebaseFirestore.getInstance()
     val productsCollection = db.collection("products")
+
+
 
     
 
@@ -86,6 +102,8 @@ fun AddProductScreen() {
             .fillMaxSize()
             .padding(16.dp)
     ) {
+
+
         // Product Image
 
         Box(
@@ -101,6 +119,8 @@ fun AddProductScreen() {
                     }
                 }
         ) {
+
+
             Image(
                 painter = imageUri?.let { painterResource(id = R.drawable.ic_launcher_background) }
                     ?: painterResource(id = R.drawable.ic_launcher_background),
@@ -155,28 +175,93 @@ fun AddProductScreen() {
                     productName = productName,
                     productPrice = productPrice,
                     productQuantity = productQuantity
+
+
                 )
 
 
-                Toast.makeText(context, "Veri Tabanına Başarıyla Eklendi!", Toast.LENGTH_SHORT).show()
-                fetchProducts(productsCollection){update ->
-                    products = update
-                }
+                Toast.makeText(context, "Ürün Başarıyla Eklendi!", Toast.LENGTH_SHORT).show()
+
             },
+
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp)
         ) {
-            Text(text = "Save")
+            Text(text = "KAYDET")
+
         }
+        Button(onClick = {
+            updateProductInFirestore(
+                productsCollection=productsCollection,
+                productId =selectedProductId.toString(),
+                updatedProductName=productName,
+                updatedProductPrice=productPrice,
+                updatedProductQuantity=productQuantity
+
+            )
+            Toast.makeText(context,"Ürün başarıyla güncellendi!",Toast.LENGTH_SHORT).show()
+            isUpdateButtonEnabled=false
+        }, enabled =isUpdateButtonEnabled,
+            modifier = Modifier
+                .fillMaxWidth()
+
+            ) {
+            Text(text = "GÜNCELLE")
+        }
+        Spacer(modifier = Modifier.height(6.dp))
+        Button(
+            onClick = {
+                selectedProductId?.let { productId ->
+                    deleteProductFromFirestore(
+                        productsCollection = productsCollection,
+                        productId = productId,
+                        onDeleteSuccess = {
+                            Toast.makeText(context, "Ürün başarıyla silindi!", Toast.LENGTH_SHORT).show()
+                            isDeleteButtonEnabled=false
+                        },
+                        onDeleteFailure = { e ->
+                            Toast.makeText(context, "Ürün silinirken bir hata oluştu.", Toast.LENGTH_SHORT).show()
+                            e.printStackTrace()
+                        }
+                    )
+                }
+            },
+            enabled = isDeleteButtonEnabled,
+            modifier = Modifier
+                .fillMaxWidth()
+
+        ) {
+            Text(text = "ÜRÜNÜ SİL")
+        }
+
+
 
         //check to database compose...
 
-        Spacer(modifier = Modifier.height(2.dp))
+        Spacer(modifier = Modifier.height(10.dp))
+
+        fetchProducts(productsCollection){update ->
+            products = update
+        }
+        Text(
+            text = "Ürünlerim",
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.padding(8.dp)
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+
+        ShowProductScreen(products = products) { selectedProduct ->
+            productName = selectedProduct.productName
+            productPrice = selectedProduct.productPrice
+            productQuantity = selectedProduct.productQuantity
+            selectedProductId = selectedProduct.productId
+
+            isUpdateButtonEnabled = true
+            isDeleteButtonEnabled=true
+        }
 
 
 
-        ShowProductScreen(products = products)
 
     }
 }
@@ -203,6 +288,10 @@ fun checkGalleryPermission(context: Context): Boolean {
 
 
 
+fun handleProductClick(product: Product, onProductSelected: (String, String, String, String) -> Unit) {
+    onProductSelected(product.productId, product.productName, product.productPrice, product.productQuantity)
+}
+
 
 
 fun uploadImageToFirebase(uri: Uri) {
@@ -225,8 +314,7 @@ fun uploadImageToFirebase(uri: Uri) {
             // Resmin yüklendiği URL'i al ve Firebase veritabanına kaydet
             imageRef.downloadUrl.addOnSuccessListener { downloadUri ->
                 val imageUrl = downloadUri.toString()
-                // İlgili Firebase veritabanına imageUrl'ü kaydetme işlemini gerçekleştir
-                // Bu işlemi projenizin gereksinimlerine uygun şekilde yapmalısınız
+
             }
         } else {
             // Hata durumunda kullanıcıya bilgi ver
@@ -253,6 +341,138 @@ fun saveProductToFirestore(
     // Firestore koleksiyonuna ürün bilgilerini ekle
     productsCollection.add(product)
 }
+
+fun updateProductInFirestore(
+    productsCollection: CollectionReference,
+    productId:String,
+    updatedProductName: String,
+    updatedProductPrice: String,
+    updatedProductQuantity: String
+) {
+    val productRef = productsCollection.document(productId)
+
+    val updatedProduct = hashMapOf(
+        "productName" to updatedProductName,
+        "productPrice" to updatedProductPrice,
+        "productQuantity" to updatedProductQuantity,
+        "timestamp" to FieldValue.serverTimestamp()
+    )
+
+
+    productRef.set(updatedProduct, SetOptions.merge())
+        .addOnSuccessListener {
+
+        }
+        .addOnFailureListener { e ->
+
+            e.printStackTrace()
+        }
+
+
+}
+fun deleteProductFromFirestore(
+    productsCollection: CollectionReference,
+    productId: String,
+    onDeleteSuccess: () -> Unit,
+    onDeleteFailure: (Exception) -> Unit
+) {
+    val productRef = productsCollection.document(productId)
+
+    productRef.delete()
+        .addOnSuccessListener {
+            onDeleteSuccess()
+        }
+        .addOnFailureListener { e ->
+            onDeleteFailure(e)
+        }
+}
+
+@Composable
+fun ShowProductScreen(products: List<Product>, onProductClick: (Product) -> Unit) {
+    LazyColumn(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalAlignment = Alignment.Start
+    ) {
+        items(products) { product ->
+            ProductRow(product = product, onProductClick = onProductClick)
+
+            Divider()
+        }
+    }
+}
+
+
+
+
+fun fetchProducts(productsCollection: CollectionReference, onProductsFetched: (List<Product>) -> Unit) {
+    val productList = mutableListOf<Product>()
+    productsCollection.get()
+        .addOnSuccessListener { documents ->
+            productList.clear()
+            for (document in documents) {
+                val productId = document.id
+                val productName = document.getString("productName") ?: ""
+                val productPrice = document.getString("productPrice") ?: ""
+                val productQuantity = document.getString("productQuantity") ?: ""
+
+                val product = Product(
+                    productId = productId,
+                    productName = productName,
+                    productPrice = productPrice,
+                    productQuantity = productQuantity
+                )
+
+                productList.add(product)
+            }
+
+
+            onProductsFetched(productList)
+        }
+        .addOnFailureListener { exception ->
+            exception.printStackTrace()
+        }
+}
+
+@Composable
+fun ProductRow(product: Product, onProductClick: (Product) -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .clickable {
+                onProductClick(product)
+            },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Product Name
+        Text(
+            text = product.productName,
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.weight(1f)
+        )
+
+        Spacer(modifier = Modifier.width(16.dp))
+
+        // Product Price
+        Text(
+            text = product.productPrice,
+            style = MaterialTheme.typography.bodyLarge
+        )
+
+        Spacer(modifier = Modifier.width(16.dp))
+
+        // Product Quantity
+        Text(
+            text = product.productQuantity,
+            style = MaterialTheme.typography.bodyLarge
+        )
+    }
+}
+
+
+
+
+
 
 
 
