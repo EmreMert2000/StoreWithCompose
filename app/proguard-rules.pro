@@ -19,3 +19,18 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+
+-keep class com.example.storewithcompose.** { *; }
+-keepclassmembers class com.example.storewithcompose.** { *; }
+-keep class dagger.** { *; }
+-keep class javax.inject.** { *; }
+-keep class androidx.hilt.** { *; }
+-keep class dagger.hilt.** { *; }
+-keep class dagger.hilt.android.** { *; }
+-keep class dagger.internal.codegen.** { *; }
+-keepclassmembers class dagger.internal.codegen.** { *; }
+-keep class com.example.storewithcompose.MyApp { *; }
+
+
+

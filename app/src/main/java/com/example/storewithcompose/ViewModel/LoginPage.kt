@@ -89,19 +89,20 @@ fun LoginScreen(
             Text(text = "Giriş Yap.")
         }
 
-           Spacer(modifier = Modifier.height(8.dp))
+           Spacer(modifier = Modifier.height(16.dp))
 
-      Button(onClick = {  },
-          modifier = Modifier
-              .fillMaxWidth()
-              .height(56.dp),
+       Button(onClick = {onLoginClick()},modifier = Modifier
+           .fillMaxWidth()
+           .height(56.dp)) {
+              Text(text = "Müşteriyim.")
 
-          //Color
-          ) {
-
-          Text(text ="Müşteriyim")
-
-      }
+       }
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = { /*TODO*/ },modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp)){
+            Text(text = "Hakkımızda")
+        }
 
 
 
@@ -125,12 +126,12 @@ fun signInWithEmailAndPassword(
     FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
         .addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                // Giriş başarılı
+
                 onLoginClick()
 
                 Toast.makeText(context, "Ürünlerinizi görebilirsiniz.", Toast.LENGTH_SHORT).show()
             } else {
-                // Giriş başarısız, hata işlemleri
+
                 Toast.makeText(
                     context,
                     "Giriş yapılamadı. Lütfen e-posta ve şifrenizi kontrol edin.",
