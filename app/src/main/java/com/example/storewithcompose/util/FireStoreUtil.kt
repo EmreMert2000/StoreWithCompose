@@ -14,15 +14,7 @@ object FirestoreUtil {
 
     private val db = FirebaseFirestore.getInstance()
 
-    suspend fun deleteFromFirebase(collection: CollectionReference, documentId: String) {
-        try {
-            val documentRef: DocumentReference = collection.document(documentId)
-            documentRef.delete().await()
-        } catch (e: Exception) {
-            e.printStackTrace()
 
-        }
-    }
 
 
 }

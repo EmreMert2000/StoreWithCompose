@@ -1,4 +1,4 @@
-package com.example.storewithcompose.ViewModel
+package com.example.storewithcompose.Row
 
 // ProductRow.kt
 
@@ -65,31 +65,9 @@ fun ProductRow(product: Product, onProductClick: (Product) -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            IconButton(
-                onClick = {
 
-                }
-            ) {
-                Icon(imageVector = Icons.Outlined.Add, contentDescription = "Ürün Ekle")
-            }
 
-            IconButton(
-                onClick = {
-                    // Silme işlemi burada gerçekleşebilir
-                    // FirestoreUtil.deleteFromFirebase(collection, product.productId)
-                }
-            ) {
-                Icon(imageVector = Icons.Outlined.Delete, contentDescription = "Sil")
-            }
 
-            IconButton(
-                onClick = {
-                    // Güncelleme işlemi burada gerçekleşebilir
-                    // Örneğin: updateProduct(product)
-                }
-            ) {
-                Icon(imageVector = Icons.Outlined.Edit, contentDescription = "Düzenle")
-            }
         }
     }
 }

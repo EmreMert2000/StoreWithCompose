@@ -1,4 +1,4 @@
-package com.example.storewithcompose.ViewModel
+package com.example.storewithcompose.Screens
 
 
 import android.content.Context
@@ -28,7 +28,7 @@ import com.google.firebase.auth.FirebaseAuth
 fun LoginScreen(
 
     onLoginClick:() ->Unit,
-
+    onCustomerClick: () -> Unit
 )
 {
     var email by remember {
@@ -78,7 +78,7 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height((16.dp)))
 
         //Login Button
-        Button(onClick ={signInWithEmailAndPassword(email,password,context,onLoginClick) }
+        Button(onClick ={ signInWithEmailAndPassword(email,password,context,onLoginClick) }
             ,
             modifier = Modifier
                 .fillMaxWidth()
@@ -91,7 +91,7 @@ fun LoginScreen(
 
            Spacer(modifier = Modifier.height(16.dp))
 
-       Button(onClick = {onLoginClick()},modifier = Modifier
+       Button(onClick = {onCustomerClick()},modifier = Modifier
            .fillMaxWidth()
            .height(56.dp)) {
               Text(text = "Müşteriyim.")
