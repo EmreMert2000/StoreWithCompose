@@ -8,9 +8,11 @@ import androidx.activity.compose.setContent
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.storewithcompose.Screens.CustomerList
 import com.example.storewithcompose.Screens.CustomerScreen
 import com.example.storewithcompose.Screens.DetailsScreen
 import com.example.storewithcompose.Screens.LoginScreen
+import com.example.storewithcompose.data.Product
 import com.example.storewithcompose.ui.theme.StoreWithComposeTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -21,6 +23,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             StoreWithComposeTheme {
                 val navController = rememberNavController()
+                val navControllerCustomer= rememberNavController()
                   //LoginScreen
                 NavHost(navController = navController, startDestination = "LoginScreen") {
                     composable("LoginScreen") {
@@ -38,11 +41,22 @@ class MainActivity : ComponentActivity() {
 
                     }
                 }
-                //CustomerScreen
+                NavHost(navController = navControllerCustomer, startDestination = "CustomerScreen") {
 
+                    composable("CustomerScreen"){
+                       // DetailsScreen(productName =selectedProducts.ProductName, productPrice = , productQuantity = )
+                    }
+                }
+
+
+                //Backed Functions
+
+
+            }
 
             }
         }
     }
-}
+
+
 

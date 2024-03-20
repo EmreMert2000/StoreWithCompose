@@ -22,6 +22,8 @@ fun DetailsScreen(productName: String, productPrice: String, productQuantity: St
         Text(text = "Ürün Fiyatı: $productPrice")
         Spacer(modifier = Modifier.height(16.dp))
         Text(text = "Ürün Adeti: $productQuantity")
+        Spacer(modifier = Modifier.height(16.dp))
         Text("Ürünümüzle ilgilendiğiniz için teşekkür ederiz!")
+        Spacer(modifier=Modifier.height(6.dp))
     }
 }
