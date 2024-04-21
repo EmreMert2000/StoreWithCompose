@@ -33,18 +33,21 @@ class AddProductViewModel @Inject constructor(private val productsCollection: Co
     private val _productQuantity = MutableStateFlow("")
     val productQuantity: StateFlow<String> = _productQuantity
 
+    private  val _productLink = MutableStateFlow("")
+    val productLink:StateFlow<String> = _productLink
+
     // Products Class
     private val _products = MutableLiveData<List<Product>>()
     val products: LiveData<List<Product>> get() = _products
 
-    suspend fun saveProductToFirestore(productName: String, productPrice: String, productQuantity: String) {
+    suspend fun saveProductToFirestore(productName: String, productPrice: String, productQuantity: String,productLink:String) {
         if (productName.isBlank() || productPrice.isBlank() || productQuantity.isBlank()) {
 
             return
         }
         try {
             val productId = UUID.randomUUID().toString()
-            val product = Product(productId, productName, productPrice, productQuantity)
+            val product = Product(productId, productName, productPrice, productQuantity, productLink)
 
             productsCollection
                 .add(product)
@@ -71,14 +74,15 @@ class AddProductViewModel @Inject constructor(private val productsCollection: Co
   }
 
     //Update Functions Firebase
-    suspend fun updateProductInFirestore(productId: String, updatedProductName: String, updatedProductPrice: String, updatedProductQuantity: String) {
+    suspend fun updateProductInFirestore(productId: String, updatedProductName: String, updatedProductPrice: String, updatedProductQuantity: String,updateProductLink:String) {
         try {
             val productRef = productsCollection.document(productId)
             productRef.update(
                 mapOf(
                     "productName" to updatedProductName,
                     "productPrice" to updatedProductPrice,
-                    "productQuantity" to updatedProductQuantity
+                    "productQuantity" to updatedProductQuantity,
+                    "productLink" to updateProductLink
                 )
             ).await()
 
@@ -102,12 +106,13 @@ class AddProductViewModel @Inject constructor(private val productsCollection: Co
                 val productName = document.getString("productName") ?: ""
                 val productPrice = document.getString("productPrice") ?: ""
                 val productQuantity = document.getString("productQuantity") ?: ""
-
+                val productLink=document.getString("productLink") ?: ""
                 val product = Product(
                     productId = productId,
                     productName = productName,
                     productPrice = productPrice,
-                    productQuantity = productQuantity
+                    productQuantity = productQuantity,
+                    productLink=productLink
                 )
 
                 productList.add(product)

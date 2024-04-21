@@ -14,8 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.storewithcompose.ViewModel.AddProductViewModel
 import com.example.storewithcompose.Screens.ProductListScreen
-
-
+import com.example.storewithcompose.data.Product
 
 
 @Composable
@@ -24,19 +23,26 @@ fun AddProductScreen(viewModel: AddProductViewModel = hiltViewModel()) {
     var productName by remember { mutableStateOf("") }
     var productQuantity by remember { mutableStateOf("") }
     var productPrice by remember { mutableStateOf("") }
+    var productLink by remember { mutableStateOf("") }
 
     var clickedAdd by remember { mutableStateOf(false) }
     var clickedDelete by remember{ mutableStateOf(false) }
     var clickedUpdate by remember { mutableStateOf(false) }
     var clickedList by remember { mutableStateOf(false) }
 
-    val (refreshProducts, setRefreshProducts) = remember { mutableStateOf(false) }
+    //val (refreshProducts, setRefreshProducts) = remember { mutableStateOf(false) }
+    val products = viewModel.products.value
+    val searchQuery = remember { mutableStateOf("") }
+    val searchResults = remember { mutableStateOf<List<Product>>(emptyList()) }
+
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
+
+
         // Product Name
         OutlinedTextField(
             value = productName,
@@ -61,7 +67,7 @@ fun AddProductScreen(viewModel: AddProductViewModel = hiltViewModel()) {
                 .fillMaxWidth()
                 .height(56.dp),
             keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Number
+                keyboardType = KeyboardType.Text
             )
         )
 
@@ -76,7 +82,21 @@ fun AddProductScreen(viewModel: AddProductViewModel = hiltViewModel()) {
                 .fillMaxWidth()
                 .height(56.dp),
             keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Number
+                keyboardType = KeyboardType.Text
+            )
+        )
+
+
+        Spacer(modifier = Modifier.height(16.dp))
+        OutlinedTextField(
+            value = productLink,
+            onValueChange = {newValue -> productLink = newValue  },
+            label = { Text(text = "Product Link") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp),
+            keyboardOptions = KeyboardOptions.Default.copy(
+                keyboardType = KeyboardType.Text
             )
         )
 
@@ -143,6 +163,30 @@ fun AddProductScreen(viewModel: AddProductViewModel = hiltViewModel()) {
             modifier = Modifier.padding(8.dp)
         )
         Spacer(modifier = Modifier.height(10.dp))
+       //Algorithm
+        fun performSearch(query: String) {
+            val filteredProducts = if (query.isNotBlank()) {
+                products!!.filter { product ->
+                    product.productName.contains(query, ignoreCase = true)
+                }
+            } else {
+                emptyList()
+            }
+            searchResults.value = filteredProducts
+        }
+        TextField(
+            value = searchQuery.value,
+            onValueChange = { newValue ->
+                searchQuery.value = newValue
+                performSearch(newValue)
+            },
+            placeholder = { Text("Ürün Ara") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
+            singleLine = true
+        )
+        Spacer(modifier = Modifier.height(6.dp))
 
         // Show Product List
         ProductListScreen(products = viewModel.products.value ?: emptyList()) { selectedProduct ->
@@ -150,6 +194,7 @@ fun AddProductScreen(viewModel: AddProductViewModel = hiltViewModel()) {
             productName = selectedProduct.productName
             productPrice = selectedProduct.productPrice
             productQuantity = selectedProduct.productQuantity
+            productLink=selectedProduct.productLink
         }
 
         LaunchedEffect(Unit) {
@@ -159,7 +204,8 @@ fun AddProductScreen(viewModel: AddProductViewModel = hiltViewModel()) {
             viewModel.saveProductToFirestore(
                 productName = productName,
                 productPrice = productPrice,
-                productQuantity = productQuantity
+                productQuantity = productQuantity,
+                productLink=productLink
             )
 
         }
@@ -173,7 +219,7 @@ fun AddProductScreen(viewModel: AddProductViewModel = hiltViewModel()) {
 
         }
         LaunchedEffect(clickedUpdate) {
-            viewModel.updateProductInFirestore(productId,productName,productPrice,productQuantity)
+            viewModel.updateProductInFirestore(productId,productName,productPrice,productQuantity,productLink)
 
         }
 

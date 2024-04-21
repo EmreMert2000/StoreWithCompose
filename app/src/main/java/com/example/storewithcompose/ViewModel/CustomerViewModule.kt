@@ -31,12 +31,15 @@ class CustomerViewModel @Inject constructor(private val firestore: FirebaseFires
                     val productName = document.getString("productName") ?: ""
                     val productPrice = document.getString("productPrice") ?: ""
                     val productQuantity = document.getString("productQuantity") ?: ""
+                    val productLink=document.getString("productLink") ?: ""
 
                     val product = Product(
                         productId = productId,
                         productName = productName,
                         productPrice = productPrice,
-                        productQuantity = productQuantity
+                        productQuantity = productQuantity,
+                        productLink = productLink
+
                     )
                     productList.add(product)
                 }

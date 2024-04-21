@@ -4,8 +4,9 @@ data class Product(
     val productId: String = "",
     val productName: String = "",
     val productPrice: String = "",
-    val productQuantity: String = ""
+    val productQuantity: String = "",
+    val productLink: String = ""
 ) {
     // No-argument constructor
-    constructor() : this("", "", "", "")
+    constructor() : this("", "", "", "", "")
 }
